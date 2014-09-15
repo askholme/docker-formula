@@ -26,3 +26,18 @@ lxc-docker:
 
 docker:
   service.running
+
+#install docker-squash
+squash:
+  archive:
+    - extracted
+    - name: /opt/squash
+    - source: https://github.com/jwilder/docker-squash/releases/download/v0.0.8/docker-squash-linux-amd64-v0.0.8.tar.gz
+    - archive_format: tar
+
+# Link to /usr/local/bin/packer
+/usr/local/bin/docker-squash:
+  file.symlink:
+    - target: /opt/squash/docker-squash
+    - require:
+      - archive: squash
