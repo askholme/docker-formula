@@ -1,7 +1,19 @@
-docker-python-apt:
+python-apt:
   pkg.installed:
     - name: python-apt
+    
+python-pip:
+  pkg.installed
 
+git:
+  pkg.installed
+
+docker-python-dockerpy:
+  pip.installed:
+    - name: git+http://github.com/dotcloud/docker-py.git
+    - require:
+      - pkg: python-apt
+      
 docker-dependencies:
    pkg.installed:
     - pkgs:
@@ -17,27 +29,21 @@ docker_repo:
       - require_in:
           - pkg: lxc-docker
       - require:
-        - pkg: docker-python-apt
+        - pkg: python-apt
 
 lxc-docker:
   pkg.latest:
     - require:
       - pkg: docker-dependencies
-
+nsenter:
+  file.managed:
+    - name: /usr/bin/nsenter
+      source: salt://docker/nsenter
+      mode: 755
+      makedirs: true
+      
 docker:
   service.running
 
-#install docker-squash
-squash:
-  archive:
-    - extracted
-    - name: /opt/squash
-    - source: https://github.com/jwilder/docker-squash/releases/download/v0.0.8/docker-squash-linux-amd64-v0.0.8.tar.gz
-    - archive_format: tar
-
-# Link to /usr/local/bin/packer
-/usr/local/bin/docker-squash:
-  file.symlink:
-    - target: /opt/squash/docker-squash
-    - require:
-      - archive: squash
+saltutil.refresh_modules:
+  module.run
